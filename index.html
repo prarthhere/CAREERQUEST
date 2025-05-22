@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Job Recommender - Personalized Matches</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Lora', serif; /* Lora for general text */
+            margin: 20px;
+            background-color: #f8f8f8; /* Off-white background */
+            color: #333333; /* Greyish black font color */
+            line-height: 1.6;
+        }
+
+        /* Main Container Styling */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Headings Styling */
+        h1, h2, h3 {
+            font-family: 'Merriweather', serif; /* Merriweather for headings */
+            color: #8f9f8f; /* Sage green for headings */
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700; /* Merriweather Bold */
+        }
+        h1 {
+            font-size: 2.5em;
+        }
+        h2 {
+            font-size: 1.8em;
+        }
+        h3 {
+            font-size: 1.5em;
+            text-align: left; /* Keep job card title left-aligned */
+        }
+
+        /* Welcome Message Styling */
+        #welcomeMessage {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #555555; /* Slightly lighter grey for welcome text */
+        }
+
+        /* Form Group Styling */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        /* Label Styling */
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600; /* Lora Semi Bold */
+            color: #333333;
+            font-size: 1.05em;
+        }
+
+        /* Select Dropdown Styling */
+        select {
+            width: calc(100% - 22px);
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            background-color: white;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238f9f8f%22%20d%3D%22M287%2C197.3l-139.7,-143c-4.4,-4.6 -11.9,-4.6 -16.3,0l-139.7,143c-4.4,4.6 -4.4,12.1 0,16.7c4.4,4.6 11.9,4.6 16.3,0l131.6,-135.2l131.6,135.2c4.4,4.6 11.9,4.6 16.3,0c4.4,-4.6 4.4,-12.1 0,-16.7Z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            cursor: pointer;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        select:focus {
+            border-color: #8f9f8f; /* Sage green focus */
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(143, 159, 143, 0.25); /* Sage green shadow */
+        }
+
+        /* Checkbox/Radio Group Styling */
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fcfcfc;
+            justify-content: flex-start;
+        }
+        .checkbox-group label, .radio-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background-color: #fff;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-weight: 400; /* Lora regular */
+        }
+        .checkbox-group label:hover, .radio-group label:hover {
+            background-color: #f0f0f0;
+            border-color: #bbb;
+        }
+        .checkbox-group input[type="checkbox"],
+        .radio-group input[type="radio"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"]:checked + span,
+        .radio-group input[type="radio"]:checked + span {
+            font-weight: 600; /* Lora Semi Bold */
+            color: #8f9f8f; /* Sage green for checked text */
+        }
+        .checkbox-group input[type="checkbox"]:checked,
+        .radio-group input[type="radio"]:checked {
+            accent-color: #8f9f8f; /* Sage green for checked state */
+        }
+
+        /* Submit Button Styling */
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px 25px;
+            background-color: #8f9f8f; /* Sage green */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 19px;
+            font-weight: 600; /* Lora Semi Bold */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(143, 159, 143, 0.2); /* Sage green shadow */
+            margin-top: 30px;
+        }
+        button:hover {
+            background-color: #7a8a7a; /* Darker sage green */
+            transform: translateY(-2px);
+        }
+
+        /* Loading Message Styling */
+        #loadingMessage {
+            text-align: center;
+            font-size: 1.1em;
+            color: #8f9f8f; /* Sage green */
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px dashed #8f9f8f; /* Sage green border */
+            border-radius: 8px;
+            background-color: #f1f7f1; /* Lighter sage green background */
+            display: none;
+        }
+
+        /* Results Section Styling */
+        #results {
+            margin-top: 50px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        #results h2 {
+            margin-bottom: 20px;
+            color: #8f9f8f; /* Sage green */
+            font-size: 1.8em;
+        }
+
+        /* Individual Job Card Styling */
+        .job-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+        .job-card:hover {
+            transform: translateY(-5px);
+        }
+        .job-card h3 {
+            color: #7a8a7a; /* Darker sage green for job title */
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            font-family: 'Merriweather', serif; /* Merriweather for job title */
+            font-weight: 700;
+        }
+        .job-card .company-location {
+            font-size: 0.9em;
+            color: #666666;
+            margin-bottom: 15px;
+            font-family: 'Lora', serif;
+        }
+        .job-card .match-reason {
+            font-style: italic;
+            color: #8f9f8f; /* Sage green */
+            margin-top: 10px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid #8f9f8f; /* Sage green border */
+            font-family: 'Lora', serif;
+        }
+        .job-card .job-description {
+            font-size: 0.95em;
+            color: #444444;
+            margin-bottom: 15px;
+            font-family: 'Lora', serif;
+        }
+
+        /* Container for multiple action buttons */
+        .job-card .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Call to Action Button Styling within Job Card */
+        .job-card .call-to-action {
+            display: block;
+            width: fit-content;
+            padding: 10px 15px;
+            background-color: #008080; /* Teal blue */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600; /* Lora Semi Bold */
+            transition: background-color 0.3s ease;
+            text-align: center;
+            flex-grow: 1;
+            min-width: 120px;
+            font-family: 'Lora', serif;
+        }
+        .job-card .call-to-action:hover {
+            background-color: #006666; /* Darker teal blue */
+        }
+
+        /* No Results Message Styling */
+        .no-results {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666666;
+            padding: 20px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Lora', serif;
+        }
+
+        /* --- Multi-Step Form Specific Styles --- */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .form-step.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        .form-navigation button {
+            width: 48%;
+            padding: 12px 20px;
+            font-size: 17px;
+            border-radius: 6px;
+            box-shadow: none;
+            font-family: 'Lora', serif;
+        }
+        .form-navigation button.prev-button {
+            background-color: #6c757d;
+        }
+        .form-navigation button.prev-button:hover {
+            background-color: #5a6268;
+        }
+        .form-navigation button.submit-button {
+            background-color: #8f9f8f; /* Sage green for final submit */
+        }
+        .form-navigation button.submit-button:hover {
+            background-color: #7a8a7a; /* Darker sage green */
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #8f9f8f; /* Sage green */
+            border-radius: 10px;
+            transition: width 0.4s ease-in-out;
+        }
+        .step-indicator {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 600; /* Lora Semi Bold */
+            color: #8f9f8f; /* Sage green */
+            font-family: 'Lora', serif;
+        }
+
+        /* Clear Button Styling */
+        #clearFormBtn {
+            background-color: #800020; /* Burgundy for clear */
+            margin-top: 20px;
+            font-size: 16px;
+            padding: 10px 15px;
+            width: auto;
+            align-self: flex-end;
+            font-family: 'Lora', serif;
+            font-weight: 600;
+        }
+        #clearFormBtn:hover {
+            background-color: #66001a; /* Darker burgundy */
+        }
+
+        /* Weighting Sliders */
+        .weight-slider-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .weight-slider-group label {
+            flex: 1;
+            margin-bottom: 0;
+            font-size: 1em;
+            color: #444444;
+            font-family: 'Lora', serif;
+        }
+        .weight-slider-group input[type="range"] {
+            flex: 2;
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+        .weight-slider-group input[type="range"]:hover {
+            opacity: 1;
+        }
+        .weight-slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #8f9f8f; /* Sage green */
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .weight-slider-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #8f9f8f; /* Sage green */
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .weight-slider-group .weight-value {
+            flex: 0.5;
+            text-align: right;
+            font-weight: 600; /* Lora Semi Bold */
+            color: #8f9f8f; /* Sage green */
+            font-family: 'Lora', serif;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the AI Job Recommender!</h1>
+        <p id="welcomeMessage"></p>
+        <p style="text-align: center; margin-bottom: 30px;">Tell us about your background and interests, and we'll find personalized job matches just for you.</p>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="step-indicator" id="stepIndicator">Step 1 of 3</div>
+
+        <form id="jobRecommendationForm">
+            <div class="form-step active" id="step1">
+                <h2>Your Academic Background</h2>
+                <div class="form-group">
+                    <label for="studies">What is your primary field of study?</label>
+                    <select id="studies" name="studies" required>
+                        <option value="">-- Select Your Field --</option>
+                        <option value="computer science">Computer Science / IT</option>
+                        <option value="data science">Data Science / Analytics</option>
+                        <option value="business/management">Business / Management</option>
+                        <option value="marketing">Marketing / Advertising</option>
+                        <option value="engineering_general">Engineering (General)</option>
+                        <option value="mechanical_engineering">Mechanical Engineering</option>
+                        <option value="electrical_engineering">Electrical Engineering</option>
+                        <option value="civil_engineering">Civil Engineering</option>
+                        <option value="design">Design / Arts (Graphic, UX, Industrial)</option>
+                        <option value="environmental science">Environmental Science / Sustainability</option>
+                        <option value="humanities/social sciences">Humanities / Social Sciences</option>
+                        <option value="healthcare">Healthcare / Medicine</option>
+                        <option value="finance/economics">Finance / Economics</option>
+                        <option value="education">Education</option>
+                        <option value="journalism/media">Journalism / Media</option>
+                        <option value="law">Law</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select your most relevant professional skills (choose multiple):</label>
+                    <div class="checkbox-group" id="skills">
+                        <label><input type="checkbox" name="skill" value="python"> <span>Python Programming</span></label>
+                        <label><input type="checkbox" name="skill" value="java"> <span>Java / C++</span></label>
+                        <label><input type="checkbox" name="skill" value="sql"> <span>SQL Database Management</span></label>
+                        <label><input type="checkbox" name="skill" value="data analysis"> <span>Data Analysis & Visualization</span></label>
+                        <label><input type="checkbox" name="skill" value="machine learning"> <span>Machine Learning & AI</span></label>
+                        <label><input type="checkbox" name="skill" value="web development"> <span>Web Development (Frontend/Backend)</span></label>
+                        <label><input type="checkbox" name="skill" value="cloud computing"> <span>Cloud Computing (AWS/Azure/GCP)</span></label>
+                        <label><input type="checkbox" name="skill" value="project management"> <span>Project Management</span></label>
+                        <label><input type="checkbox" name="skill" value="digital marketing"> <span>Digital Marketing (SEO/SEM)</span></label>
+                        <label><input type="checkbox" name="skill" value="ux/ui design"> <span>UX/UI Design</span></label>
+                        <label><input type="checkbox" name="skill" value="graphic design"> <span>Graphic Design (Adobe Suite)</span></label>
+                        <label><input type="checkbox" name="skill" value="communication"> <span>Communication & Presentation</span></label>
+                        <label><input type="checkbox" name="skill" value="financial modeling"> <span>Financial Modeling</span></label>
+                        <label><input type="checkbox" name="skill" value="legal research"> <span>Legal Research</span></label>
+                        <label><input type="checkbox" name="skill" value="content creation"> <span>Content Creation / Copywriting</span></label>
+                        <label><input type="checkbox" name="skill" value="customer service"> <span>Customer Service</span></label>
+                        <label><input type="checkbox" name="skill" value="sales"> <span>Sales & Negotiation</span></label>
+                        <label><input type="checkbox" name="skill" value="research"> <span>Research & Analysis</span></label>
+                        <label><input type="checkbox" name="skill" value="autocad"> <span>AutoCAD / CAD Software</span></label>
+                        <label><input type="checkbox" name="skill" value="robotics"> <span>Robotics</span></label>
+                        <label><input type="checkbox" name="skill" value="biotechnology"> <span>Biotechnology</span></label>
+                        <label><input type="checkbox" name="skill" value="public speaking"> <span>Public Speaking</span></label>
+                    </div>
+                </div>
+                <div class="form-navigation">
+                    <button type="button" class="next-button" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step2">
+                <h2>Your Hobbies & Interests</h2>
+                <div class="form-group">
+                    <label>What are your significant hobbies and interests (choose multiple):</label>
+                    <div class="checkbox-group" id="hobbies">
+                        <label><input type="checkbox" name="hobby" value="coding"> <span>Coding / Personal Projects</span></label>
+                        <label><input type="checkbox" name="hobby" value="gaming"> <span>Gaming (video games, board games)</span></label>
+                        <label><input type="checkbox" name="hobby" value="writing"> <span>Writing (stories, blogs, poetry)</span></label>
+                        <label><input type="checkbox" name="hobby" value="photography"> <span>Photography / Videography</span></label>
+                        <label><input type="checkbox" name="hobby" value="volunteering"> <span>Volunteering / Community Work</span></label>
+                        <label><input type="checkbox" name="hobby" value="problem-solving"> <span>Solving Puzzles / Brain Teasers</span></label>
+                        <label><input type="checkbox" name="hobby" value="reading"> <span>Reading (non-fiction, research)</span></label>
+                        <label><input type="checkbox" name="hobby" value="art_drawing"> <span>Art / Drawing / Painting</span></label>
+                        <label><input type="checkbox" name="hobby" value="music"> <span>Playing Music / Listening to Music</span></label>
+                        <label><input type="checkbox" name="hobby" value="outdoor activities"> <span>Outdoor Activities (hiking, sports, travel)</span></label>
+                        <label><input type="checkbox" name="hobby" value="learning new things"> <span>Learning New Things / Self-study</span></label>
+                        <label><input type="checkbox" name="hobby" value="socializing"> <span>Socializing / Networking</span></label>
+                        <label><input type="checkbox" name="hobby" value="editing"> <span>Video/Photo Editing</span></label>
+                        <label><input type="checkbox" name="hobby" value="fitness"> <span>Fitness / Sports</span></label>
+                        <label><input type="checkbox" name="hobby" value="cooking"> <span>Cooking / Baking</span></label>
+                        <label><input type="checkbox" name="hobby" value="gardening"> <span>Gardening</span></label>
+                        <label><input type="checkbox" name="hobby" value="travel"> <span>Traveling</span></label>
+                        <label><input type="checkbox" name="hobby" value="robotics_hobby"> <span>Robotics (Hobbyist)</span></label>
+                        <label><input type="checkbox" name="hobby" value="debating"> <span>Debating / Public Speaking</span></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>What are you deeply passionate about? (Choose up to 3 for best results):</label>
+                    <div class="checkbox-group" id="passion">
+                        <label><input type="checkbox" name="passion" value="innovation"> <span>Innovation & New Technologies</span></label>
+                        <label><input type="checkbox" name="passion" value="social impact"> <span>Social Impact & Helping Others</span></label>
+                        <label><input type="checkbox" name="passion" value="creativity"> <span>Creativity & Expressing Ideas</span></label>
+                        <label><input type="checkbox" name="passion" value="efficiency"> <span>Efficiency & Optimization</span></label>
+                        <label><input type="checkbox" name="passion" value="sustainability"> <span>Environmental Sustainability</span></label>
+                        <label><input type="checkbox" name="passion" value="leadership"> <span>Leadership & Mentorship</span></label>
+                        <label><input type="checkbox" name="passion" value="data driven"> <span>Data-Driven Decision Making</span></label>
+                        <label><input type="checkbox" name="passion" value="communication"> <span>Effective Communication</span></label>
+                        <label><input type="checkbox" name="passion" value="problem solving"> <span>Complex Problem Solving</span></label>
+                        <label><input type="checkbox" name="passion" value="storytelling"> <span>Storytelling & Persuasion</span></label>
+                        <label><input type="checkbox" name="passion" value="customer satisfaction"> <span>Customer Satisfaction</span></label>
+                        <label><input type="checkbox" name="passion" value="continuous learning"> <span>Continuous Learning & Growth</span></label>
+                        <label><input type="checkbox" name="passion" value="public service"> <span>Public Service</span></label>
+                        <label><input type="checkbox" name="passion" value="health_wellness"> <span>Health & Wellness</span></label>
+                    </div>
+                </div>
+                <div class="form-navigation">
+                    <button type="button" class="prev-button" onclick="prevStep()">Previous</button>
+                    <button type="button" class="next-button" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step3">
+                <h2>Your Job Preferences</h2>
+                <p style="text-align: center; margin-bottom: 25px;">How important are these factors to you in a job match? (1 = Less Important, 5 = Most Important)</p>
+
+                <div class="form-group weight-slider-group">
+                    <label for="weightStudies">Academic Background:</label>
+                    <input type="range" id="weightStudies" min="1" max="5" value="3" class="weight-slider">
+                    <span class="weight-value" id="valStudies">3</span>
+                </div>
+                <div class="form-group weight-slider-group">
+                    <label for="weightSkills">Professional Skills:</label>
+                    <input type="range" id="weightSkills" min="1" max="5" value="4" class="weight-slider">
+                    <span class="weight-value" id="valSkills">4</span>
+                </div>
+                <div class="form-group weight-slider-group">
+                    <label for="weightHobbies">Hobbies & Interests:</label>
+                    <input type="range" id="weightHobbies" min="1" max="5" value="2" class="weight-slider">
+                    <span class="weight-value" id="valHobbies">2</span>
+                </div>
+                <div class="form-group weight-slider-group">
+                    <label for="weightPassion">Deep Passions:</label>
+                    <input type="range" id="weightPassion" min="1" max="5" value="5" class="weight-slider">
+                    <span class="weight-value" id="valPassion">5</span>
+                </div>
+
+                <div class="form-navigation">
+                    <button type="button" class="prev-button" onclick="prevStep()">Previous</button>
+                    <button type="submit" class="submit-button">Find My Perfect Jobs</button>
+                </div>
+            </div>
+        </form>
+
+        <p id="loadingMessage">Analyzing your profile and finding the best matches...</p>
+
+        <div id="results">
+            </div>
+
+        <button type="button" id="clearFormBtn" onclick="clearForm()">Clear All Selections</button>
+    </div>
+
+    <script>
+        let currentStep = 0; // Start at the first step (index 0)
+        const formSteps = document.querySelectorAll('.form-step');
+        const progressBar = document.getElementById('progressBar');
+        const stepIndicator = document.getElementById('stepIndicator');
+
+        // --- Multi-Step Form Functions ---
+        function showStep(stepIndex) {
+            formSteps.forEach((step, index) => {
+                if (index === stepIndex) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+            currentStep = stepIndex;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentStep + 1) / formSteps.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            stepIndicator.textContent = `Step ${currentStep + 1} of ${formSteps.length}`;
+        }
+
+        function nextStep() {
+            // Basic validation for current step before moving to next
+            if (currentStep === 0) { // Step 1: Studies & Skills
+                const studiesSelected = document.getElementById('studies').value !== "";
+                const skillsChecked = document.querySelectorAll('#skills input[name="skill"]:checked').length > 0;
+                if (!studiesSelected || !skillsChecked) {
+                    alert("Please select your field of study and at least one professional skill.");
+                    return;
+                }
+            } else if (currentStep === 1) { // Step 2: Hobbies & Passions
+                const hobbiesChecked = document.querySelectorAll('#hobbies input[name="hobby"]:checked').length > 0;
+                const passionsChecked = document.querySelectorAll('#passion input[name="passion"]:checked').length > 0;
+                if (!hobbiesChecked || !passionsChecked) {
+                    alert("Please select at least one hobby and one passion.");
+                    return;
+                }
+            }
+
+            if (currentStep < formSteps.length - 1) {
+                showStep(currentStep + 1);
+                // Scroll to top of container for better UX on step change
+                document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                showStep(currentStep - 1);
+                document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Initialize form to first step
+        document.addEventListener('DOMContentLoaded', () => {
+            showStep(0);
+        });
+
+
+        // --- Dynamic Welcome Message Function ---
+        function setWelcomeMessage() {
+            const welcomeElement = document.getElementById('welcomeMessage');
+            if (welcomeElement) {
+                const now = new Date();
+                const hours = now.getHours();
+                let greeting;
+
+                if (hours < 12) {
+                    greeting = "Good morning!";
+                } else if (hours < 18) {
+                    greeting = "Good afternoon!";
+                } else {
+                    greeting = "Good evening!";
+                }
+                welcomeElement.textContent = `${greeting} Ready to find your perfect job?`;
+            }
+        }
+
+        // Call the welcome message function when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', setWelcomeMessage);
+
+        // --- Limit Passion Checkboxes ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const passionCheckboxes = document.querySelectorAll('#passion input[type="checkbox"]');
+            const maxPassionSelections = 3; // Max limit for passions
+
+            passionCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('#passion input[type="checkbox"]:checked').length;
+                    if (checkedCount > maxPassionSelections) {
+                        this.checked = false;
+                        alert(`Please select a maximum of ${maxPassionSelections} passions.`);
+                    }
+                });
+            });
+        });
+
+        // --- Weight Slider Value Display ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliders = document.querySelectorAll('.weight-slider');
+            sliders.forEach(slider => {
+                const valueSpan = document.getElementById(`val${slider.id.replace('weight', '')}`);
+                if (valueSpan) {
+                    valueSpan.textContent = slider.value; // Set initial value
+                    slider.addEventListener('input', () => {
+                        valueSpan.textContent = slider.value; // Update on slide
+                    });
+                }
+            });
+        });
+
+        // --- Clear Form Function ---
+        function clearForm() {
+            const form = document.getElementById('jobRecommendationForm');
+            form.reset(); // Resets all form inputs
+
+            // Uncheck all checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Reset dropdowns to first option
+            document.querySelectorAll('select').forEach(select => {
+                if (select.options.length > 0) {
+                    select.value = select.options[0].value;
+                }
+            });
+
+            // Reset slider values and their displays
+            document.getElementById('weightStudies').value = 3;
+            document.getElementById('valStudies').textContent = 3;
+            document.getElementById('weightSkills').value = 4;
+            document.getElementById('valSkills').textContent = 4;
+            document.getElementById('weightHobbies').value = 2;
+            document.getElementById('valHobbies').textContent = 2;
+            document.getElementById('weightPassion').value = 5;
+            document.getElementById('valPassion').textContent = 5;
+
+
+            // Hide results and loading messages
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('results').innerHTML = ''; // Clear content
+
+            // Go back to the first step
+            showStep(0);
+            document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        // --- Main Form Submission Logic ---
+        document.getElementById('jobRecommendationForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission and page reload
+
+            const loadingMessage = document.getElementById('loadingMessage');
+            const resultsDiv = document.getElementById('results');
+
+            if (!loadingMessage || !resultsDiv) {
+                console.error("Missing loading or results div. Check IDs.");
+                return;
+            }
+
+            resultsDiv.innerHTML = ''; // Clear previous results
+            resultsDiv.style.display = 'none'; // Hide results
+            loadingMessage.style.display = 'block'; // Show loading message
+
+            // --- Collect values from MCQs/Dropdowns ---
+            const studiesSelect = document.getElementById('studies');
+            const selectedStudies = studiesSelect ? studiesSelect.value.toLowerCase() : '';
+
+            const selectedSkills = Array.from(document.querySelectorAll('#skills input[name="skill"]:checked'))
+                                       .map(checkbox => checkbox.value.toLowerCase());
+
+            const selectedHobbies = Array.from(document.querySelectorAll('#hobbies input[name="hobby"]:checked'))
+                                        .map(checkbox => checkbox.value.toLowerCase());
+
+            const selectedPassions = Array.from(document.querySelectorAll('#passion input[name="passion"]:checked'))
+                                         .map(checkbox => checkbox.value.toLowerCase());
+
+            // --- Collect Weighting Preferences ---
+            const weightStudies = parseInt(document.getElementById('weightStudies').value);
+            const weightSkills = parseInt(document.getElementById('weightSkills').value);
+            const weightHobbies = parseInt(document.getElementById('weightHobbies').value);
+            const weightPassion = parseInt(document.getElementById('weightPassion').value);
+
+
+            // --- Simulate AI processing delay ---
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Simulates a 3-second delay for a more realistic feel
+
+            // --- Simplified Job Matching Logic (Backend Simulation) ---
+            const allPossibleJobs = [
+                {
+                    title: "AI/Machine Learning Engineer",
+                    company: "InnovateTech Solutions",
+                    location: "Bengaluru, India",
+                    description: "Develop and deploy cutting-edge AI models, focusing on NLP and computer vision. Work with large datasets and contribute to open-source initiatives.",
+                    studies_match: ["computer science", "engineering_general", "data science"],
+                    skills_match: ["python", "machine learning", "cloud computing", "data analysis", "java", "robotics"],
+                    hobbies_match: ["coding", "problem-solving", "learning new things", "gaming", "robotics_hobby"],
+                    passion_match: ["innovation", "data driven", "efficiency", "complex problem solving", "continuous learning"]
+                },
+                {
+                    title: "Data Scientist",
+                    company: "Quantify Insights Inc.",
+                    location: "Hyderabad, India",
+                    description: "Analyze complex data to extract actionable insights, build predictive models, and present findings to stakeholders.",
+                    studies_match: ["data science", "computer science", "finance/economics", "engineering_general"],
+                    skills_match: ["python", "sql", "data analysis", "machine learning", "communication", "research"],
+                    hobbies_match: ["problem-solving", "reading", "learning new things"],
+                    passion_match: ["data driven", "efficiency", "complex problem solving", "continuous learning"]
+                },
+                {
+                    title: "Software Developer (Gaming Focus)",
+                    company: "PixelPlay Studios",
+                    location: "Pune, India",
+                    description: "Design, develop, and test interactive game experiences. Collaborate with artists and designers to bring virtual worlds to life.",
+                    studies_match: ["computer science", "engineering_general", "design"],
+                    skills_match: ["web development", "java", "python", "graphic design"],
+                    hobbies_match: ["gaming", "coding", "problem-solving", "writing", "art_drawing"],
+                    passion_match: ["creativity", "innovation", "complex problem solving"]
+                },
+                {
+                    title: "Digital Marketing Specialist",
+                    company: "BrandBoost Agency",
+                    location: "Delhi, India",
+                    description: "Plan and execute digital marketing campaigns across various channels. Analyze campaign performance and optimize for ROI.",
+                    studies_match: ["marketing", "business/management", "journalism/media", "humanities/social sciences"],
+                    skills_match: ["digital marketing", "communication", "content creation", "graphic design", "sales", "public speaking"],
+                    hobbies_match: ["writing", "photography", "socializing", "editing"],
+                    passion_match: ["communication", "creativity", "storytelling", "customer satisfaction"]
+                },
+                {
+                    title: "Environmental Consultant",
+                    company: "GreenFuture Solutions",
+                    location: "Chennai, India",
+                    description: "Advise clients on environmental impact assessment, sustainability strategies, and regulatory compliance.",
+                    studies_match: ["environmental science", "engineering_general", "law"],
+                    skills_match: ["project management", "communication", "research", "data analysis"],
+                    hobbies_match: ["volunteering", "outdoor activities", "reading", "gardening"],
+                    passion_match: ["sustainability", "social impact", "problem solving", "public service"]
+                },
+                {
+                    title: "UX/UI Designer",
+                    company: "UserFirst Innovations",
+                    location: "Bengaluru, India",
+                    description: "Create intuitive and aesthetically pleasing user interfaces. Conduct user research and build wireframes/prototypes.",
+                    studies_match: ["design", "computer science", "humanities/social sciences"],
+                    skills_match: ["ux/ui design", "graphic design", "web development", "communication", "research"],
+                    hobbies_match: ["design", "photography", "problem-solving", "art_drawing"],
+                    passion_match: ["creativity", "innovation", "efficiency", "customer satisfaction"]
+                },
+                {
+                    title: "Business Analyst",
+                    company: "Growth Accelerators",
+                    location: "Mumbai, India",
+                    description: "Bridge the gap between business needs and technical solutions. Analyze processes, define requirements, and improve efficiency.",
+                    studies_match: ["business/management", "computer science", "data science", "finance/economics"],
+                    skills_match: ["data analysis", "project management", "communication", "sql", "financial modeling"],
+                    hobbies_match: ["problem-solving", "reading", "learning new things"],
+                    passion_match: ["efficiency", "data driven", "leadership", "complex problem solving", "continuous learning"]
+                },
+                {
+                    title: "Healthcare Administrator",
+                    company: "MediCare Services",
+                    location: "Kochi, India",
+                    description: "Manage operations, staff, and patient services in a healthcare setting. Focus on efficiency and patient satisfaction.",
+                    studies_match: ["healthcare", "business/management", "humanities/social sciences"],
+                    skills_match: ["project management", "communication", "customer service"],
+                    hobbies_match: ["volunteering", "reading", "socializing", "fitness"],
+                    passion_match: ["social impact", "efficiency", "leadership", "customer satisfaction", "health_wellness", "public service"]
+                },
+                {
+                    title: "Mechanical Design Engineer",
+                    company: "Precision Engineering Co.",
+                    location: "Chennai, India",
+                    description: "Design and optimize mechanical systems and components using CAD software. Oversee prototyping and testing phases.",
+                    studies_match: ["mechanical_engineering", "engineering_general"],
+                    skills_match: ["autocad", "research", "project management", "robotics"],
+                    hobbies_match: ["problem-solving", "learning new things", "design", "robotics_hobby"],
+                    passion_match: ["innovation", "efficiency", "complex problem solving"]
+                },
+                {
+                    title: "Financial Analyst",
+                    company: "Global Capital Partners",
+                    location: "Delhi, India",
+                    description: "Conduct financial forecasting, reporting, and operational metrics tracking. Support investment decisions and market analysis.",
+                    studies_match: ["finance/economics", "business/management", "data science"],
+                    skills_match: ["financial modeling", "data analysis", "sql", "communication"],
+                    hobbies_match: ["reading", "problem-solving", "learning new things"],
+                    passion_match: ["data driven", "efficiency", "complex problem solving", "continuous learning"]
+                },
+                {
+                    title: "Content Writer / Editor",
+                    company: "Digital Spark Agency",
+                    location: "Mumbai, India",
+                    description: "Create engaging and SEO-friendly content for websites, blogs, and marketing materials. Edit and proofread for quality.",
+                    studies_match: ["journalism/media", "marketing", "humanities/social sciences", "education"],
+                    skills_match: ["content creation", "creative writing", "digital marketing", "communication", "research", "editing"],
+                    hobbies_match: ["writing", "reading", "editing", "storytelling", "photography"],
+                    passion_match: ["creativity", "communication", "storytelling", "continuous learning"]
+                },
+                {
+                    title: "Civil Site Engineer",
+                    company: "Urban Infrastructure Builders",
+                    location: "Kolkata, India",
+                    description: "Oversee daily operations at construction sites, ensuring projects are on schedule and meet quality standards.",
+                    studies_match: ["civil_engineering", "engineering_general"],
+                    skills_match: ["project management", "autocad", "communication"],
+                    hobbies_match: ["outdoor activities", "problem-solving", "leadership"],
+                    passion_match: ["efficiency", "complex problem solving", "leadership", "public service"]
+                },
+                {
+                    title: "Market Research Analyst",
+                    company: "Consumer Insights Hub",
+                    location: "Bengaluru, India",
+                    description: "Design and execute market research studies, analyze consumer data, and provide insights to drive business strategy.",
+                    studies_match: ["marketing", "data science", "business/management", "humanities/social sciences"],
+                    skills_match: ["data analysis", "research", "communication", "digital marketing"],
+                    hobbies_match: ["reading", "problem-solving", "learning new things"],
+                    passion_match: ["data driven", "complex problem solving", "efficiency"]
+                },
+                {
+                    title: "Educator / Trainer",
+                    company: "Future Learning Academy",
+                    location: "Delhi, India",
+                    description: "Develop and deliver engaging educational content to students or professionals. Assess learning outcomes and adapt teaching methods.",
+                    studies_match: ["education", "humanities/social sciences", "any"],
+                    skills_match: ["communication", "public speaking", "content creation", "research"],
+                    hobbies_match: ["volunteering", "learning new things", "reading", "socializing", "debating"],
+                    passion_match: ["social impact", "communication", "leadership", "storytelling", "continuous learning", "public service"]
+                },
+                {
+                    title: "Customer Success Manager",
+                    company: "ClientFirst Solutions",
+                    location: "Hyderabad, India",
+                    description: "Build strong relationships with clients, ensure their satisfaction, and help them achieve success using the product/service.",
+                    studies_match: ["business/management", "marketing", "humanities/social sciences", "communication"],
+                    skills_match: ["communication", "sales", "customer service", "project management"],
+                    hobbies_match: ["socializing", "volunteering", "problem-solving"],
+                    passion_match: ["customer satisfaction", "social impact", "communication", "leadership"]
+                },
+                {
+                    title: "Robotics Engineer",
+                    company: "Automate Systems",
+                    location: "Pune, India",
+                    description: "Design, develop, and test robotic systems for industrial automation. Work with hardware and software components.",
+                    studies_match: ["electrical_engineering", "mechanical_engineering", "computer science", "engineering_general"],
+                    skills_match: ["robotics", "java", "python", "autocad"],
+                    hobbies_match: ["robotics_hobby", "coding", "problem-solving", "learning new things"],
+                    passion_match: ["innovation", "efficiency", "complex problem solving"]
+                },
+                {
+                    title: "Biotechnology Researcher",
+                    company: "BioGen Innovations",
+                    location: "Mumbai, India",
+                    description: "Conduct research in molecular biology and genetic engineering to develop new pharmaceuticals and biotechnological solutions.",
+                    studies_match: ["healthcare"], // Mapping general healthcare for this example
+                    skills_match: ["biotechnology", "research", "data analysis"],
+                    hobbies_match: ["reading", "learning new things", "problem-solving"],
+                    passion_match: ["innovation", "social impact", "complex problem solving", "health_wellness"]
+                }
+            ];
+
+            const matchedJobs = [];
+
+            allPossibleJobs.forEach(job => {
+                let score = 0;
+                let reasons = [];
+
+                // Check studies match (single select)
+                if (selectedStudies && job.studies_match.includes(selectedStudies) && selectedStudies !== "other") {
+                    score += 5 * weightStudies; // Apply user-defined weight
+                    const selectedOptionText = studiesSelect.options[studiesSelect.selectedIndex].text;
+                    reasons.push(`Primary study field: "${selectedOptionText}"`);
+                }
+
+                // Check skills match (multiple checkboxes)
+                selectedSkills.forEach(selectedSkill => {
+                    if (job.skills_match.includes(selectedSkill)) {
+                        score += 3 * weightSkills; // Apply user-defined weight
+                        const skillLabel = document.querySelector(`#skills input[value="${selectedSkill}"] + span`);
+                        if (skillLabel) reasons.push(`Skill: "${skillLabel.textContent}"`);
+                    }
+                });
+
+                // Check hobbies match (multiple checkboxes)
+                selectedHobbies.forEach(selectedHobby => {
+                    if (job.hobbies_match.includes(selectedHobby)) {
+                        score += 1 * weightHobbies; // Apply user-defined weight
+                        const hobbyLabel = document.querySelector(`#hobbies input[value="${selectedHobby}"] + span`);
+                        if (hobbyLabel) reasons.push(`Hobby: "${hobbyLabel.textContent}"`);
+                    }
+                });
+
+                // Check passions match (multiple checkboxes)
+                selectedPassions.forEach(selectedPassion => {
+                    if (job.passion_match.includes(selectedPassion)) {
+                        score += 2 * weightPassion; // Apply user-defined weight
+                        const passionLabel = document.querySelector(`#passion input[value="${selectedPassion}"] + span`);
+                        if (passionLabel) reasons.push(`Passion: "${passionLabel.textContent}"`);
+                    }
+                });
+
+                // Only consider jobs with a positive match score and at least one explicit reason
+                if (score > 0 && reasons.length > 0) {
+                    matchedJobs.push({ ...job, score: score, reasons: reasons });
+                }
+            });
+
+            // Sort jobs by score (highest first)
+            matchedJobs.sort((a, b) => b.score - a.score);
+
+            // Hide loading message
+            loadingMessage.style.display = 'none';
+
+            // Display results
+            if (matchedJobs.length > 0) {
+                const topResults = matchedJobs.slice(0, 7); // Example: show top 7 jobs for more variety
+
+                resultsDiv.innerHTML = '<h2>Your Personalized Job Matches</h2>'; // Add this line to show a heading for the results
+
+                topResults.forEach(job => {
+                    const jobCard = document.createElement('div');
+                    jobCard.className = 'job-card';
+                    jobCard.innerHTML = `
+                        <h3>${job.title}</h3>
+                        <p class="company-location">${job.company} - ${job.location}</p>
+                        <p class="job-description">${job.description}</p>
+                        <p class="match-reason"><strong>Why this match?</strong> Based on your input, we found connections with: ${job.reasons.join(', ')}.</p>
+                        <div class="action-buttons">
+                            <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title + ' ' + job.company)}" target="_blank" class="call-to-action">Apply via LinkedIn</a>
+                            <a href="https://in.indeed.com/jobs?q=${encodeURIComponent(job.title + ' ' + job.company + ' ' + job.location)}" target="_blank" class="call-to-action">Apply via Indeed</a>
+                            <a href="https://www.naukri.com/jobs-in-${encodeURIComponent(job.location.split(',')[0].trim().toLowerCase())}?k=${encodeURIComponent(job.title)}" target="_blank" class="call-to-action">Apply via Naukri</a>
+                        </div>
+                    `;
+                    resultsDiv.appendChild(jobCard);
+                });
+            } else {
+                resultsDiv.innerHTML = `
+                    <p class="no-results">
+                        We couldn't find immediate matches based on your current selections and preferences.
+                        Please try adjusting your selections or the importance of each factor!
+                    </p>
+                `;
+            }
+
+            resultsDiv.style.display = 'block'; // Show the results section
+            resultsDiv.scrollIntoView({ behavior: 'smooth' }); // Scroll to results for better UX
+        });
+    </script>
+</body>
+</html>
